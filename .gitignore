@@ -1,0 +1,14 @@
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Maven
+target/
+
+# Configuracion local de la base de datos (cada quien tiene la suya)
+src/main/resources/db.properties
+
+# Sistema
+.DS_Store
+Thumbs.db

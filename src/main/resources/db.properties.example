@@ -1,0 +1,5 @@
+# Copia este archivo como "db.properties" (misma carpeta) y ajusta tus datos.
+# db.properties NO se sube a GitHub porque cada quien tiene su propia contrasena.
+db.url=jdbc:mysql://localhost:3306/fruteria_blanco?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Tijuana&characterEncoding=UTF-8
+db.user=root
+db.password=root

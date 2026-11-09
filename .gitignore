@@ -7,6 +7,7 @@ out/
 target/
 
 # Configuracion local de la base de datos (cada quien tiene la suya)
+db.properties
 src/main/resources/db.properties
 
 # Sistema

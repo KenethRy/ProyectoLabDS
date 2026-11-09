@@ -4,8 +4,7 @@
 -- Ejecutar completo en MySQL Workbench o con: mysql -u root -p < schema.sql
 -- =====================================================================
 
-DROP DATABASE IF EXISTS fruteria_blanco;
-CREATE DATABASE fruteria_blanco CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS fruteria_blanco CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE fruteria_blanco;
 
 -- ---------------------------------------------------------------------
@@ -41,6 +40,7 @@ CREATE TABLE productos (
     id_producto            INT AUTO_INCREMENT PRIMARY KEY,
     codigo                 VARCHAR(30)  NOT NULL UNIQUE,
     nombre                 VARCHAR(120) NOT NULL,
+    categoria              VARCHAR(60) NOT NULL DEFAULT 'General',
     descripcion            TEXT,
     precio                 DECIMAL(10,2) NOT NULL,
     stock                  DECIMAL(10,3) NOT NULL DEFAULT 0,
@@ -284,8 +284,8 @@ VALUES ('Administrador', 'admin@fruteriablanco.com',
         (SELECT id_rol FROM roles WHERE nombre = 'Administrador'));
 
 -- Productos de ejemplo para probar (se pueden borrar)
-INSERT INTO productos (codigo, nombre, descripcion, precio, stock, stock_minimo, unidad_medida, creado_por) VALUES
-    ('FR-001', 'Manzana roja',  'Manzana roja por kilo', 38.00, 50, 10, 'KG', 1),
-    ('FR-002', 'Platano',       'Platano por kilo',      24.50, 80, 15, 'KG', 1),
-    ('FR-003', 'Aguacate Hass', 'Aguacate por kilo',     89.00, 30,  8, 'KG', 1),
-    ('FR-004', 'Sandia',        'Sandia por pieza',      65.00, 12,  3, 'PIEZA', 1);
+INSERT INTO productos (codigo, nombre, categoria, descripcion, precio, stock, stock_minimo, unidad_medida, creado_por) VALUES
+    ('FR-001', 'Manzana roja',  'Frutas', 'Manzana roja por kilo', 38.00, 50, 10, 'KG', 1),
+    ('FR-002', 'Platano',       'Frutas', 'Platano por kilo',      24.50, 80, 15, 'KG', 1),
+    ('FR-003', 'Aguacate Hass', 'Frutas', 'Aguacate por kilo',     89.00, 30,  8, 'KG', 1),
+    ('FR-004', 'Sandia',        'Frutas', 'Sandia por pieza',      65.00, 12,  3, 'PIEZA', 1);

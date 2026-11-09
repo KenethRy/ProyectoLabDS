@@ -10,6 +10,7 @@ public class Producto {
     private int idProducto;
     private String codigo;
     private String nombre;
+    private String categoria = "General";
     private String descripcion;
     private BigDecimal precio;
     private BigDecimal stock = BigDecimal.ZERO;
@@ -30,6 +31,9 @@ public class Producto {
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }

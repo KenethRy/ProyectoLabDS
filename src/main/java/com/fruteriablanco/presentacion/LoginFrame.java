@@ -96,6 +96,7 @@ public class LoginFrame extends JFrame {
                     if (causa instanceof AuthException) {
                         lblMensaje.setText(causa.getMessage());
                     } else {
+                        causa.printStackTrace();
                         lblMensaje.setText("Ocurrió un error inesperado.");
                     }
                     txtContrasena.setText("");

@@ -6,38 +6,78 @@ import com.fruteriablanco.util.SesionActual;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Menú principal PROVISIONAL, para comprobar que el login funciona.
- * UI-01 (Brandon) lo reemplazará por el menú real con ventas, inventario y reportes,
- * y SEG-02 (Eliazin) agregará qué botones ve cada rol.
- */
+/** Menu principal posterior al inicio de sesion. */
 public class MenuPrincipalFrame extends JFrame {
+
+    private static final Color VERDE = new Color(46, 125, 82);
+    private static final Color FONDO = new Color(247, 250, 246);
 
     public MenuPrincipalFrame() {
         super("Frutería Blanco");
 
-        Usuario u = SesionActual.getUsuario();
+        Usuario usuario = SesionActual.getUsuario();
 
-        JPanel panel = new JPanel(new GridLayout(0, 1, 0, 8));
-        panel.setBorder(BorderFactory.createEmptyBorder(24, 40, 24, 40));
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(FONDO);
+        panel.setBorder(BorderFactory.createEmptyBorder(28, 38, 28, 38));
 
-        JLabel bienvenida = new JLabel("Bienvenido, " + u.getNombre(), SwingConstants.CENTER);
-        bienvenida.setFont(bienvenida.getFont().deriveFont(Font.BOLD, 18f));
-        panel.add(bienvenida);
-        panel.add(new JLabel("Rol: " + u.getRol().getNombre(), SwingConstants.CENTER));
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.gridx = 0;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
+        gc.insets = new Insets(5, 0, 5, 0);
 
-        JButton btnSalir = new JButton("Cerrar sesión");
+        JLabel titulo = new JLabel("Frutería Blanco", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titulo.setForeground(VERDE);
+        gc.gridy = 0;
+        panel.add(titulo, gc);
+
+        JLabel bienvenida = new JLabel("Bienvenido, " + usuario.getNombre(), SwingConstants.CENTER);
+        bienvenida.setFont(new Font("SansSerif", Font.BOLD, 16));
+        gc.gridy = 1;
+        gc.insets = new Insets(12, 0, 3, 0);
+        panel.add(bienvenida, gc);
+
+        JLabel rol = new JLabel("Rol: " + usuario.getRol().getNombre(), SwingConstants.CENTER);
+        rol.setForeground(new Color(85, 95, 85));
+        gc.gridy = 2;
+        gc.insets = new Insets(0, 0, 18, 0);
+        panel.add(rol, gc);
+
+        if (usuario.esAdministrador()) {
+            JButton btnProductos = new JButton("Registrar y administrar productos");
+            btnProductos.setFont(new Font("SansSerif", Font.BOLD, 14));
+            btnProductos.setBackground(VERDE);
+            btnProductos.setForeground(Color.BLACK);
+            btnProductos.setFocusPainted(false);
+            btnProductos.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnProductos.addActionListener(e -> new ProductoFrame().setVisible(true));
+            gc.gridy = 3;
+            gc.insets = new Insets(0, 0, 8, 0);
+            panel.add(btnProductos, gc);
+        } else {
+            JLabel aviso = new JLabel("La administración de productos esta disponible para el rol Administrador.", SwingConstants.CENTER);
+            aviso.setForeground(new Color(120, 90, 40));
+            gc.gridy = 3;
+            gc.insets = new Insets(0, 0, 8, 0);
+            panel.add(aviso, gc);
+        }
+
+        JButton btnSalir = new JButton("Cerrar sesion");
         btnSalir.addActionListener(e -> {
             SesionActual.cerrar();
             new LoginFrame().setVisible(true);
             dispose();
         });
-        panel.add(btnSalir);
+        gc.gridy = 4;
+        gc.insets = new Insets(8, 0, 0, 0);
+        panel.add(btnSalir, gc);
 
         setContentPane(panel);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(410, 250));
         pack();
-        setMinimumSize(new Dimension(340, 0));
         setLocationRelativeTo(null);
     }
 }

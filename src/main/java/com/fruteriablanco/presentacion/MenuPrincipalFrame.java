@@ -40,6 +40,7 @@ public class MenuPrincipalFrame extends JFrame {
         panel.add(bienvenida, gc);
 
         JLabel rol = new JLabel("Rol: " + usuario.getRol().getNombre(), SwingConstants.CENTER);
+        rol.setFont(new Font("SansSerif", Font.PLAIN, 14));
         rol.setForeground(new Color(85, 95, 85));
         gc.gridy = 2;
         gc.insets = new Insets(0, 0, 18, 0);
@@ -48,8 +49,11 @@ public class MenuPrincipalFrame extends JFrame {
         if (usuario.esAdministrador()) {
             JButton btnProductos = new JButton("Registrar y administrar productos");
             btnProductos.setFont(new Font("SansSerif", Font.BOLD, 14));
+            btnProductos.setContentAreaFilled(false);
+            btnProductos.setOpaque(true);
+            btnProductos.setBorderPainted(false);
             btnProductos.setBackground(VERDE);
-            btnProductos.setForeground(Color.BLACK);
+            btnProductos.setForeground(Color.WHITE);
             btnProductos.setFocusPainted(false);
             btnProductos.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnProductos.addActionListener(e -> new ProductoFrame().setVisible(true));
@@ -58,6 +62,7 @@ public class MenuPrincipalFrame extends JFrame {
             panel.add(btnProductos, gc);
         } else {
             JLabel aviso = new JLabel("La administración de productos esta disponible para el rol Administrador.", SwingConstants.CENTER);
+            aviso.setFont(new Font("SansSerif", Font.PLAIN, 13));
             aviso.setForeground(new Color(120, 90, 40));
             gc.gridy = 3;
             gc.insets = new Insets(0, 0, 8, 0);
@@ -65,10 +70,19 @@ public class MenuPrincipalFrame extends JFrame {
         }
 
         JButton btnSalir = new JButton("Cerrar sesion");
+        btnSalir.setContentAreaFilled(false);
+        btnSalir.setOpaque(true);
+        btnSalir.setBorderPainted(false);
+        btnSalir.setBackground(new Color(230, 230, 230));
+        btnSalir.setForeground(new Color(60, 60, 60));
+        btnSalir.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        btnSalir.setFocusPainted(false);
+        btnSalir.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnSalir.addActionListener(e -> {
             SesionActual.cerrar();
             new LoginFrame().setVisible(true);
             dispose();
+
         });
         gc.gridy = 4;
         gc.insets = new Insets(8, 0, 0, 0);

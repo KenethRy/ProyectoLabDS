@@ -41,6 +41,7 @@ public class LoginFrame extends JFrame {
 
         JLabel titulo = new JLabel("Frutería Blanco", SwingConstants.CENTER);
         titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 22f));
+        titulo.setForeground(new Color(30, 100, 200));   // azul
         gc.gridy = 0;
         gc.insets = new Insets(0, 0, 16, 0);
         panel.add(titulo, gc);
@@ -58,7 +59,14 @@ public class LoginFrame extends JFrame {
         lblMensaje.setForeground(new Color(180, 30, 30));
         gc.gridy = 5;
         panel.add(lblMensaje, gc);
-
+        btnIngresar.setContentAreaFilled(false);   // quita el relleno de Windows
+        btnIngresar.setOpaque(true);               // deja pintar nuestro color
+        btnIngresar.setBackground(new Color(46, 125, 82));
+        btnIngresar.setForeground(Color.WHITE);
+        btnIngresar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnIngresar.setFocusPainted(false);
+        btnIngresar.setBorderPainted(false);
+        btnIngresar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         gc.gridy = 6;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnIngresar, gc);

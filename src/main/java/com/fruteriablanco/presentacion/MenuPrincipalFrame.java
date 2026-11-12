@@ -60,6 +60,20 @@ public class MenuPrincipalFrame extends JFrame {
             gc.gridy = 3;
             gc.insets = new Insets(0, 0, 8, 0);
             panel.add(btnProductos, gc);
+
+            // USR-01: registrar y administrar usuarios (solo Administrador)
+            JButton btnUsuarios = new JButton("Registrar y administrar usuarios");
+            btnUsuarios.setFont(new Font("SansSerif", Font.BOLD, 14));
+            btnUsuarios.setContentAreaFilled(false);
+            btnUsuarios.setOpaque(true);
+            btnUsuarios.setBorderPainted(false);
+            btnUsuarios.setBackground(VERDE);
+            btnUsuarios.setForeground(Color.WHITE);
+            btnUsuarios.setFocusPainted(false);
+            btnUsuarios.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnUsuarios.addActionListener(e -> new UsuarioFrame().setVisible(true));
+            gc.gridy = 4;
+            panel.add(btnUsuarios, gc);
         } else {
             JLabel aviso = new JLabel("La administración de productos esta disponible para el rol Administrador.", SwingConstants.CENTER);
             aviso.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -101,7 +115,7 @@ public class MenuPrincipalFrame extends JFrame {
             dispose();
 
         });
-        gc.gridy = 4;
+        gc.gridy = 6;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnSalir, gc);
 

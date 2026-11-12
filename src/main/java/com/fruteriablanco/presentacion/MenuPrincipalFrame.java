@@ -68,7 +68,24 @@ public class MenuPrincipalFrame extends JFrame {
             gc.insets = new Insets(0, 0, 8, 0);
             panel.add(aviso, gc);
         }
-
+// VEN-01: registrar ventas (Administrador y Empleado)
+        boolean puedeVender = usuario.esAdministrador()
+                || "Empleado".equalsIgnoreCase(usuario.getRol().getNombre());
+        if (puedeVender) {
+            JButton btnVentas = new JButton("Registrar venta");
+            btnVentas.setContentAreaFilled(false);
+            btnVentas.setOpaque(true);
+            btnVentas.setBorderPainted(false);
+            btnVentas.setBackground(VERDE);
+            btnVentas.setForeground(Color.WHITE);
+            btnVentas.setFont(new Font("SansSerif", Font.BOLD, 14));
+            btnVentas.setFocusPainted(false);
+            btnVentas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnVentas.addActionListener(e -> new VentaFrame().setVisible(true));
+            gc.gridy = 5;
+            gc.insets = new Insets(0, 0, 8, 0);
+            panel.add(btnVentas, gc);
+        }
         JButton btnSalir = new JButton("Cerrar sesion");
         btnSalir.setContentAreaFilled(false);
         btnSalir.setOpaque(true);

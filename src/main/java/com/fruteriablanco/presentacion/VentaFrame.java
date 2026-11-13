@@ -2,6 +2,7 @@
 package com.fruteriablanco.presentacion;
 
 import com.fruteriablanco.modelo.DetalleVenta;
+import com.fruteriablanco.modelo.MetodoPago;
 import com.fruteriablanco.modelo.Producto;
 import com.fruteriablanco.modelo.Venta;
 import com.fruteriablanco.servicio.VentaException;
@@ -26,6 +27,7 @@ public class VentaFrame extends JFrame {
 
     private final JTextField txtBuscar = new JTextField(18);
     private final JTextField txtCantidad = new JTextField(6);
+    private final JComboBox<MetodoPago> cboMetodoPago = new JComboBox<>(MetodoPago.values());
 
     private final DefaultTableModel modeloProductos = new DefaultTableModel(
             new String[]{"Código", "Producto", "Unidad", "Precio", "Stock"}, 0) {
@@ -118,10 +120,15 @@ public class VentaFrame extends JFrame {
         lblTotal.setForeground(VERDE);
         lblMensaje.setForeground(new Color(180, 30, 30));
 
-        JPanel totales = new JPanel(new GridLayout(3, 1));
+        JPanel totales = new JPanel(new GridLayout(4, 1));
         totales.setOpaque(false);
         totales.add(lblSubtotal);
         totales.add(lblTotal);
+        JPanel panelMetodo = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        panelMetodo.setOpaque(false);
+        panelMetodo.add(new JLabel("Método de pago:"));
+        panelMetodo.add(cboMetodoPago);
+        totales.add(panelMetodo);
         totales.add(lblMensaje);
 
         JButton btnQuitar = new JButton("Quitar producto");
@@ -193,7 +200,7 @@ public class VentaFrame extends JFrame {
 
     private void confirmar() {
         try {
-            servicio.confirmar(venta);
+            servicio.confirmar(venta, (MetodoPago) cboMetodoPago.getSelectedItem());
             JOptionPane.showMessageDialog(this,
                     "Venta registrada.\nFolio: " + venta.getFolio() + "\nTotal: " + dinero(venta.getTotal()),
                     "Venta exitosa", JOptionPane.INFORMATION_MESSAGE);

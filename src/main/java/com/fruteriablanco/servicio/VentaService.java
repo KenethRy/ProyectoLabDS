@@ -45,16 +45,28 @@ public class VentaService {
      * Si el producto ya estaba, suma las cantidades.
      */
     public void agregarProducto(Venta venta, Producto producto, String cantidadTexto) throws VentaException {
+        if (venta == null) {
+            throw new VentaException("No hay una venta en proceso.");
+        }
         if (producto == null) {
             throw new VentaException("Selecciona un producto.");
         }
         if (!producto.isActivo()) {
             throw new VentaException("El producto esta inactivo.");
         }
+        if (producto.getPrecio() == null || producto.getPrecio().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new VentaException("El producto no tiene un precio de venta valido.");
+        }
+        if (producto.getStock() == null || producto.getStock().compareTo(BigDecimal.ZERO) < 0) {
+            throw new VentaException("El producto tiene una existencia invalida.");
+        }
 
         BigDecimal cantidad = leerCantidad(cantidadTexto);
 
         // Piezas, cajas y bolsas no se venden partidas; el kilo si admite decimales.
+        if (producto.getUnidadMedida() == null) {
+            throw new VentaException("El producto no tiene una unidad de medida valida.");
+        }
         if (producto.getUnidadMedida() != Producto.UnidadMedida.KG
                 && cantidad.stripTrailingZeros().scale() > 0) {
             throw new VentaException("Este producto se vende por " + producto.getUnidadMedida()
@@ -95,6 +107,9 @@ public class VentaService {
         if (venta == null || venta.getDetalles().isEmpty()) {
             throw new VentaException("Agrega al menos un producto a la venta.");
         }
+        for (DetalleVenta detalle : venta.getDetalles()) {
+            validarDetalle(detalle);
+        }
 
         Usuario usuario = SesionActual.getUsuario();
         if (usuario == null) {
@@ -111,6 +126,20 @@ public class VentaService {
             throw new VentaException(e.getMessage(), e);
         } catch (SQLException e) {
             throw new VentaException("No se pudo registrar la venta: " + e.getMessage(), e);
+        }
+    }
+
+    private void validarDetalle(DetalleVenta detalle) throws VentaException {
+        if (detalle == null || detalle.getCantidad() == null
+                || detalle.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new VentaException("La cantidad debe ser mayor a cero.");
+        }
+        if (detalle.getCantidad().stripTrailingZeros().scale() > 3) {
+            throw new VentaException("La cantidad admite maximo 3 decimales.");
+        }
+        if (detalle.getPrecioUnitario() == null
+                || detalle.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new VentaException("El producto no tiene un precio de venta valido.");
         }
     }
 

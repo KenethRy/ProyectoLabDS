@@ -48,6 +48,7 @@ public class VentaRepository {
                 }
                 con.commit();
             } catch (SQLException | RuntimeException ex) {
+                venta.setIdVenta(0);
                 try {
                     con.rollback();
                 } catch (SQLException rollback) {
@@ -57,6 +58,7 @@ public class VentaRepository {
             }
         }
     }
+
 
     private int insertarVenta(Connection con, Venta venta) throws SQLException {
         String sql = """

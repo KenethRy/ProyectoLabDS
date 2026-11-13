@@ -95,6 +95,10 @@ public class VentaService {
         if (venta == null || venta.getDetalles().isEmpty()) {
             throw new VentaException("Agrega al menos un producto a la venta.");
         }
+        // Criterio: no existen descuentos duplicados
+        if (venta.getIdVenta() != 0) {
+            throw new VentaException("Esta venta ya fue registrada.");
+        }
 
         Usuario usuario = SesionActual.getUsuario();
         if (usuario == null) {

@@ -95,6 +95,9 @@ public class VentaService {
         if (venta == null || venta.getDetalles().isEmpty()) {
             throw new VentaException("Agrega al menos un producto a la venta.");
         }
+        if (venta.getIdVenta() > 0) {
+            throw new VentaException("La venta ya fue confirmada.");
+        }
 
         Usuario usuario = SesionActual.getUsuario();
         if (usuario == null) {

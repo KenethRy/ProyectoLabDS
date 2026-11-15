@@ -2,6 +2,7 @@
 package com.fruteriablanco.servicio;
 
 import com.fruteriablanco.modelo.DetalleVenta;
+import com.fruteriablanco.modelo.MetodoPago;
 import com.fruteriablanco.modelo.Producto;
 import com.fruteriablanco.modelo.Usuario;
 import com.fruteriablanco.modelo.Venta;
@@ -90,7 +91,7 @@ public class VentaService {
     }
 
     /** Confirma la venta: valida y la guarda con su folio, usuario y descuento de inventario. */
-    public void confirmar(Venta venta) throws VentaException {
+    public void confirmar(Venta venta, MetodoPago metodoPago) throws VentaException {
         // Criterio: se rechazan ventas sin productos
         if (venta == null || venta.getDetalles().isEmpty()) {
             throw new VentaException("Agrega al menos un producto a la venta.");
@@ -98,6 +99,10 @@ public class VentaService {
         // Criterio: no existen descuentos duplicados
         if (venta.getIdVenta() != 0) {
             throw new VentaException("Esta venta ya fue registrada.");
+        }
+        // PAG-01: se debe seleccionar un metodo de pago valido
+        if (metodoPago == null) {
+            throw new VentaException("Selecciona un metodo de pago.");
         }
 
         Usuario usuario = SesionActual.getUsuario();
@@ -109,7 +114,7 @@ public class VentaService {
         venta.setFolio("V-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")));
 
         try {
-            ventaRepository.guardar(venta);
+            ventaRepository.guardar(venta, metodoPago);
         } catch (IllegalArgumentException e) {
             // Stock insuficiente o producto inactivo detectado al guardar
             throw new VentaException(e.getMessage(), e);

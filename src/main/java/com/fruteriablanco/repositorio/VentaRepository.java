@@ -2,6 +2,7 @@
 package com.fruteriablanco.repositorio;
 
 import com.fruteriablanco.modelo.DetalleVenta;
+import com.fruteriablanco.modelo.MetodoPago;
 import com.fruteriablanco.modelo.Venta;
 import com.fruteriablanco.util.Conexion;
 
@@ -23,7 +24,7 @@ public class VentaRepository {
      * @throws IllegalArgumentException si un producto no existe o no alcanza el stock
      * @throws SQLException si falla la base de datos
      */
-    public void guardar(Venta venta) throws SQLException {
+    public void guardar(Venta venta, MetodoPago metodoPago) throws SQLException {
         try (Connection con = Conexion.getConnection()) {
             con.setAutoCommit(false);
             try {
@@ -46,6 +47,8 @@ public class VentaRepository {
                     descontarLotes(con, d.getIdProducto(), d.getCantidad());
                     insertarMovimiento(con, venta, idVenta, idMotivo, d, stockAnterior, stockNuevo);
                 }
+                // PAG-01: el pago se guarda en la misma transaccion, asociado a esta venta
+                insertarPago(con, idVenta, metodoPago, venta.getTotal());
                 con.commit();
             } catch (SQLException | RuntimeException ex) {
                 venta.setIdVenta(0);
@@ -59,6 +62,22 @@ public class VentaRepository {
         }
     }
 
+
+    private void insertarPago(Connection con, int idVenta, MetodoPago metodoPago, BigDecimal monto)
+            throws SQLException {
+        String sql = """
+                INSERT INTO pagos (id_venta, id_metodo_pago, monto)
+                SELECT ?, id_metodo_pago, ? FROM metodos_pago WHERE nombre = ? AND activo = TRUE
+                """;
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idVenta);
+            ps.setBigDecimal(2, monto);
+            ps.setString(3, metodoPago.getNombre());
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("El metodo de pago '" + metodoPago + "' no existe o esta inactivo.");
+            }
+        }
+    }
 
     private int insertarVenta(Connection con, Venta venta) throws SQLException {
         String sql = """

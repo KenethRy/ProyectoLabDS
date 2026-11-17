@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    actor A as Administrador
+    participant PF as ProductoFrame
+    participant PD as ProductoDialog
+    participant PS as ProductoService
+    participant PR as ProductoRepository
+    participant DB as MySQL
+
+    A->>PF: Pulsa Registrar producto
+    PF->>PD: new ProductoDialog()
+    A->>PD: Llena el formulario y pulsa Guardar producto
+    Note over PD: Corre en un SwingWorker
+    PD->>PS: crear(producto, stockInicial, proveedor, telefono, vencimiento, idUsuario)
+
+    PS->>PS: validarProducto() y validarCantidad()
+    alt Datos invalidos
+        PS-->>PD: IllegalArgumentException con el mensaje
+        PD-->>A: Muestra el mensaje y no guarda
+    else Datos validos
+        PS->>PR: insertar(...)
+        PR->>DB: BEGIN (autoCommit = false)
+        PR->>DB: INSERT productos
+        opt Existencia inicial mayor a cero
+            PR->>DB: Busca o crea el proveedor
+            PR->>DB: INSERT lotes
+            PR->>DB: INSERT movimientos_inventario (ENTRADA, STOCK INICIAL)
+        end
+        PR->>DB: INSERT bitacora_auditoria (CREAR)
+        alt Todo salio bien
+            PR->>DB: COMMIT
+            PR-->>PS: listo
+            PS-->>PD: listo
+            PD-->>PF: Cierra el dialogo y recarga la lista
+            PF-->>A: Producto visible en la tabla
+        else Error de base de datos (por ejemplo codigo duplicado)
+            PR->>DB: ROLLBACK
+            PR-->>PD: SQLException
+            PD-->>A: "No fue posible guardar"
+        end
+    end

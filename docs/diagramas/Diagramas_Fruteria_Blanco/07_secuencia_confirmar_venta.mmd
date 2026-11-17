@@ -1,0 +1,56 @@
+sequenceDiagram
+    autonumber
+    actor E as Empleado o Administrador
+    participant VF as VentaFrame
+    participant VS as VentaService
+    participant PR as ProductoRepository
+    participant VR as VentaRepository
+    participant DB as MySQL
+
+    E->>VF: Escribe en el buscador
+    VF->>VS: buscarProductos(filtro)
+    VS->>PR: listar(filtro)
+    PR->>DB: SELECT productos
+    VS-->>VF: Solo productos activos
+
+    loop Por cada producto que se agrega
+        E->>VF: Selecciona producto y cantidad, pulsa Agregar
+        VF->>VS: agregarProducto(venta, producto, cantidad)
+        alt Cantidad invalida o stock insuficiente
+            VS-->>VF: VentaException con el mensaje
+            VF-->>E: Muestra el mensaje
+        else Valida
+            VS-->>VF: Carrito actualizado (suma si ya estaba)
+        end
+    end
+
+    E->>VF: Elige el metodo de pago y pulsa Confirmar venta
+    VF->>VS: confirmar(venta, metodoPago)
+
+    alt Carrito vacio, venta ya registrada, sin metodo de pago o sin sesion
+        VS-->>VF: VentaException
+        VF-->>E: Muestra el mensaje
+    else Venta valida
+        VS->>VS: Asigna usuario de SesionActual y genera el folio
+        VS->>VR: guardar(venta, metodoPago)
+        VR->>DB: BEGIN
+        VR->>DB: INSERT ventas (estado COMPLETADA)
+        loop Por cada renglon del carrito
+            VR->>DB: SELECT stock FROM productos FOR UPDATE
+            alt La cantidad supera el stock
+                VR->>DB: ROLLBACK
+                VR-->>VF: Stock insuficiente
+                VF-->>E: Muestra el mensaje y no guarda nada
+            else Hay existencia
+                VR->>DB: INSERT detalle_venta
+                VR->>DB: UPDATE productos SET stock (resta)
+                VR->>DB: UPDATE lotes (descuenta cantidad_actual)
+                VR->>DB: INSERT movimientos_inventario (SALIDA, id_venta)
+            end
+        end
+        VR->>DB: INSERT pagos (metodo y monto = total)
+        VR->>DB: COMMIT
+        VR-->>VS: listo
+        VS-->>VF: listo
+        VF-->>E: Venta registrada con su folio
+    end

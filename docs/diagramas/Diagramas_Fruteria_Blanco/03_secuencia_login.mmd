@@ -1,0 +1,48 @@
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant LF as LoginFrame
+    participant AS as AuthService
+    participant UR as UsuarioRepository
+    participant DB as MySQL
+    participant SA as SesionActual
+    participant MP as MenuPrincipalFrame
+
+    U->>LF: Escribe correo y contrasena, pulsa Iniciar sesion
+    Note over LF: La consulta corre en un SwingWorker<br/>para no congelar la ventana
+    LF->>AS: iniciarSesion(correo, contrasena)
+
+    alt Correo o contrasena vacios
+        AS-->>LF: AuthException "Ingresa tu correo y tu contrasena"
+        LF-->>U: Muestra el mensaje
+    else Campos completos
+        AS->>UR: buscarPorCorreo(correo)
+        UR->>DB: SELECT usuario y rol WHERE correo = ?
+        DB-->>UR: Usuario o vacio
+        UR-->>AS: Optional de Usuario
+
+        alt El correo no existe
+            AS->>UR: registrarAcceso(null, correo, false)
+            UR->>DB: INSERT historial_acceso
+            AS-->>LF: AuthException "Correo o contrasena incorrectos"
+            LF-->>U: Muestra el mensaje
+        else Cuenta inactiva
+            AS->>UR: registrarAcceso(id, correo, false)
+            UR->>DB: INSERT historial_acceso
+            AS-->>LF: AuthException "Cuenta inactiva"
+            LF-->>U: Muestra el mensaje
+        else Cuenta activa
+            AS->>AS: BCrypt.checkpw(contrasena, hash)
+            AS->>UR: registrarAcceso(id, correo, resultado)
+            UR->>DB: INSERT historial_acceso
+            alt Contrasena incorrecta
+                AS-->>LF: AuthException "Correo o contrasena incorrectos"
+                LF-->>U: Muestra el mensaje y limpia la contrasena
+            else Contrasena correcta
+                AS-->>LF: Usuario autenticado
+                LF->>SA: iniciar(usuario)
+                LF->>MP: new MenuPrincipalFrame()
+                MP-->>U: Menu segun el rol
+            end
+        end
+    end

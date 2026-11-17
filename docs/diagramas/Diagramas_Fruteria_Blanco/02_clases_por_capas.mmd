@@ -1,0 +1,163 @@
+classDiagram
+    direction LR
+
+    namespace Presentacion {
+        class LoginFrame {
+            +iniciarSesion()
+        }
+        class MenuPrincipalFrame
+        class ProductoFrame {
+            +cargarProductos()
+            +desactivar()
+            +activar()
+        }
+        class ProductoDialog {
+            +guardar()
+        }
+        class MovimientoDialog {
+            +registrar()
+        }
+        class UsuarioFrame {
+            +cargarUsuarios()
+        }
+        class UsuarioDialog {
+            +guardar()
+        }
+        class VentaFrame {
+            +agregar()
+            +quitar()
+            +confirmar()
+        }
+    }
+
+    namespace Servicio {
+        class AuthService {
+            +iniciarSesion(correo, contrasena) Usuario
+        }
+        class ProductoService {
+            +listar(filtro)
+            +crear(...)
+            +actualizar(producto, idUsuario)
+            +desactivar(id, idUsuario)
+            +activar(id, idUsuario)
+            +registrarMovimiento(...)
+        }
+        class UsuarioService {
+            +listar(filtro)
+            +crear(usuario, clave, confirmar, idAdmin)
+            +actualizar(usuario, clave, confirmar, idAdmin)
+            +eliminar(id, idAdmin)
+            +reactivar(id, idAdmin)
+        }
+        class VentaService {
+            +buscarProductos(filtro)
+            +agregarProducto(venta, producto, cantidad)
+            +quitarProducto(venta, idProducto)
+            +confirmar(venta, metodoPago)
+        }
+    }
+
+    namespace Repositorio {
+        class UsuarioRepository {
+            +buscarPorCorreo(correo)
+            +registrarAcceso(id, correo, exitoso)
+            +insertar(usuario, idAdmin)
+            +actualizar(usuario, idAdmin)
+            +desactivar(id, idAdmin)
+        }
+        class ProductoRepository {
+            +listar(filtro)
+            +insertar(...)
+            +actualizar(producto, idUsuario)
+            +registrarMovimiento(...)
+        }
+        class VentaRepository {
+            +guardar(venta, metodoPago)
+        }
+    }
+
+    namespace Modelo {
+        class Usuario {
+            -idUsuario
+            -nombre
+            -correo
+            -contrasenaHash
+            -activo
+            +esAdministrador() boolean
+        }
+        class Rol {
+            -idRol
+            -nombre
+        }
+        class Producto {
+            -idProducto
+            -codigo
+            -nombre
+            -categoria
+            -precio
+            -stock
+            -stockMinimo
+            -unidadMedida
+            -activo
+        }
+        class Venta {
+            -idVenta
+            -folio
+            -total
+            -detalles
+        }
+        class DetalleVenta {
+            -idProducto
+            -cantidad
+            -precioUnitario
+        }
+        class MetodoPago {
+            <<enumeration>>
+            EFECTIVO
+            TARJETA
+            TRANSFERENCIA
+        }
+    }
+
+    namespace Util {
+        class Conexion {
+            +getConnection() Connection
+        }
+        class SesionActual {
+            +iniciar(usuario)
+            +cerrar()
+            +getUsuario() Usuario
+        }
+    }
+
+    LoginFrame --> AuthService
+    LoginFrame --> SesionActual
+    LoginFrame --> MenuPrincipalFrame
+    MenuPrincipalFrame --> ProductoFrame
+    MenuPrincipalFrame --> UsuarioFrame
+    MenuPrincipalFrame --> VentaFrame
+    ProductoFrame --> ProductoDialog
+    ProductoFrame --> MovimientoDialog
+    ProductoFrame --> ProductoService
+    ProductoDialog --> ProductoService
+    MovimientoDialog --> ProductoService
+    UsuarioFrame --> UsuarioDialog
+    UsuarioFrame --> UsuarioService
+    UsuarioDialog --> UsuarioService
+    VentaFrame --> VentaService
+
+    AuthService --> UsuarioRepository
+    UsuarioService --> UsuarioRepository
+    ProductoService --> ProductoRepository
+    VentaService --> ProductoRepository
+    VentaService --> VentaRepository
+    VentaService --> SesionActual
+
+    UsuarioRepository --> Conexion
+    ProductoRepository --> Conexion
+    VentaRepository --> Conexion
+
+    Usuario "*" --> "1" Rol
+    Venta "1" *-- "1..*" DetalleVenta
+    Venta ..> MetodoPago
+    SesionActual --> Usuario

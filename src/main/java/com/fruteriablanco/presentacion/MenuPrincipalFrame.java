@@ -100,6 +100,20 @@ public class MenuPrincipalFrame extends JFrame {
             gc.insets = new Insets(0, 0, 8, 0);
             panel.add(btnVentas, gc);
         }
+        // BUS-02: consultar ventas (todos los roles)
+        JButton btnConsulta = new JButton("Consultar ventas");
+        btnConsulta.setContentAreaFilled(false);
+        btnConsulta.setOpaque(true);
+        btnConsulta.setBorderPainted(false);
+        btnConsulta.setBackground(VERDE);
+        btnConsulta.setForeground(Color.WHITE);
+        btnConsulta.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnConsulta.setFocusPainted(false);
+        btnConsulta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnConsulta.addActionListener(e -> new ConsultaVentasFrame().setVisible(true));
+        gc.gridy = 7;
+        gc.insets = new Insets(0, 0, 8, 0);
+        panel.add(btnConsulta, gc);
         JButton btnSalir = new JButton("Cerrar sesion");
         btnSalir.setContentAreaFilled(false);
         btnSalir.setOpaque(true);
@@ -115,7 +129,7 @@ public class MenuPrincipalFrame extends JFrame {
             dispose();
 
         });
-        gc.gridy = 6;
+        gc.gridy = 8;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnSalir, gc);
 

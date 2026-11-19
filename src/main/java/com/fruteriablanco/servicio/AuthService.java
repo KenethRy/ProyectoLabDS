@@ -58,7 +58,7 @@ public class AuthService {
             return usuario;
 
         } catch (SQLException e) {
-            throw new AuthException("No se pudo conectar con la base de datos. Verifica que MySQL esté encendido.", e);
+            throw new AuthException("No se pudo conectar con la base de datos, verifica que MySQL esté encendido.", e);
         }
     }
 }

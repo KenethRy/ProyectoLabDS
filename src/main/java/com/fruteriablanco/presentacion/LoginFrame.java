@@ -32,7 +32,7 @@ public class LoginFrame extends JFrame {
 
     private void construirInterfaz() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
+        panel.setBorder(BorderFactory.createEmptyBorder(24, 100, 24, 100));
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;

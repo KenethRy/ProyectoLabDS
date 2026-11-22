@@ -100,6 +100,22 @@ public class MenuPrincipalFrame extends JFrame {
             gc.insets = new Insets(0, 0, 8, 0);
             panel.add(btnVentas, gc);
         }
+
+        // ALE: alertas de inventario
+        JButton btnAlertas = new JButton("Alertas de inventario");
+        btnAlertas.setContentAreaFilled(false);
+        btnAlertas.setOpaque(true);
+        btnAlertas.setBorderPainted(false);
+        btnAlertas.setBackground(VERDE);
+        btnAlertas.setForeground(Color.WHITE);
+        btnAlertas.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnAlertas.setFocusPainted(false);
+        btnAlertas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAlertas.addActionListener(e -> new AlertasFrame(usuario.getIdUsuario()).setVisible(true));
+        gc.gridy = 8;
+        gc.insets = new Insets(0, 0, 8, 0);
+        panel.add(btnAlertas, gc);
+
         // BUS-02: consultar ventas (todos los roles)
         JButton btnConsulta = new JButton("Consultar ventas");
         btnConsulta.setContentAreaFilled(false);
@@ -129,7 +145,7 @@ public class MenuPrincipalFrame extends JFrame {
             dispose();
 
         });
-        gc.gridy = 8;
+        gc.gridy = 9;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnSalir, gc);
 

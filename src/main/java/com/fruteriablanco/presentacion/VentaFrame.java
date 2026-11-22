@@ -8,6 +8,8 @@ import com.fruteriablanco.modelo.Venta;
 import com.fruteriablanco.servicio.VentaException;
 import com.fruteriablanco.servicio.VentaService;
 
+import com.fruteriablanco.util.Navegacion;
+
 import javax.swing.*;
         import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -87,7 +89,7 @@ public class VentaFrame extends JFrame {
 
         JPanel panelAgregar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         panelAgregar.setOpaque(false);
-        JLabel lblCantidad = new JLabel("Cantidad:");
+        JLabel lblCantidad = new JLabel("Cantidad o KG:");
         lblCantidad.setFont(new Font("SansSerif", Font.BOLD, 13));
         JButton btnAgregar = new JButton("Agregar a la venta");
         estilizar(btnAgregar, VERDE, Color.WHITE);
@@ -145,6 +147,7 @@ public class VentaFrame extends JFrame {
 
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         botones.setOpaque(false);
+        botones.add(Navegacion.botonVolver(this, this::confirmarSalida));
         botones.add(btnQuitar);
         botones.add(btnConfirmar);
 
@@ -218,6 +221,16 @@ public class VentaFrame extends JFrame {
         } catch (VentaException e) {
             mostrarError(e.getMessage());
         }
+    }
+
+    /** Si hay productos sin confirmar, pregunta antes de volver al menu. */
+    private boolean confirmarSalida() {
+        if (venta.getDetalles().isEmpty()) {
+            return true;
+        }
+        return JOptionPane.showConfirmDialog(this,
+                "La venta actual no se ha confirmado y se perdera. Volver al menu?",
+                "Venta sin confirmar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     private void refrescarCarrito() {

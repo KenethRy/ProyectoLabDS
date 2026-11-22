@@ -1,12 +1,19 @@
 package com.fruteriablanco.presentacion;
 
 import com.fruteriablanco.modelo.Usuario;
+import com.fruteriablanco.util.Navegacion;
 import com.fruteriablanco.util.SesionActual;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.function.Supplier;
 
-/** Menu principal posterior al inicio de sesion. */
+/**
+ * Menu principal posterior al inicio de sesion.
+ * Atajos: Ctrl+1 Productos, Ctrl+2 Usuarios, Ctrl+3 Ventas, Ctrl+4 Alertas, Ctrl+5 Consultar ventas.
+ * Al abrir una ventana el menu se oculta y reaparece al volver (boton Volver o Ctrl+B).
+ */
 public class MenuPrincipalFrame extends JFrame {
 
     private static final Color VERDE = new Color(46, 125, 82);
@@ -46,90 +53,40 @@ public class MenuPrincipalFrame extends JFrame {
         gc.insets = new Insets(0, 0, 18, 0);
         panel.add(rol, gc);
 
+        gc.insets = new Insets(0, 0, 8, 0);
+
         if (usuario.esAdministrador()) {
-            JButton btnProductos = new JButton("Registrar y administrar productos");
-            btnProductos.setFont(new Font("SansSerif", Font.BOLD, 14));
-            btnProductos.setContentAreaFilled(false);
-            btnProductos.setOpaque(true);
-            btnProductos.setBorderPainted(false);
-            btnProductos.setBackground(VERDE);
-            btnProductos.setForeground(Color.WHITE);
-            btnProductos.setFocusPainted(false);
-            btnProductos.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnProductos.addActionListener(e -> new ProductoFrame().setVisible(true));
             gc.gridy = 3;
-            gc.insets = new Insets(0, 0, 8, 0);
-            panel.add(btnProductos, gc);
+            panel.add(opcion("Registrar y administrar productos", 1, KeyEvent.VK_1, ProductoFrame::new), gc);
 
             // USR-01: registrar y administrar usuarios (solo Administrador)
-            JButton btnUsuarios = new JButton("Registrar y administrar usuarios");
-            btnUsuarios.setFont(new Font("SansSerif", Font.BOLD, 14));
-            btnUsuarios.setContentAreaFilled(false);
-            btnUsuarios.setOpaque(true);
-            btnUsuarios.setBorderPainted(false);
-            btnUsuarios.setBackground(VERDE);
-            btnUsuarios.setForeground(Color.WHITE);
-            btnUsuarios.setFocusPainted(false);
-            btnUsuarios.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnUsuarios.addActionListener(e -> new UsuarioFrame().setVisible(true));
             gc.gridy = 4;
-            panel.add(btnUsuarios, gc);
+            panel.add(opcion("Registrar y administrar usuarios", 2, KeyEvent.VK_2, UsuarioFrame::new), gc);
         } else {
             JLabel aviso = new JLabel("La administración de productos esta disponible para el rol Administrador.", SwingConstants.CENTER);
             aviso.setFont(new Font("SansSerif", Font.PLAIN, 13));
             aviso.setForeground(new Color(120, 90, 40));
             gc.gridy = 3;
-            gc.insets = new Insets(0, 0, 8, 0);
             panel.add(aviso, gc);
         }
-// VEN-01: registrar ventas (Administrador y Empleado)
+
+        // VEN-01: registrar ventas (Administrador y Empleado)
         boolean puedeVender = usuario.esAdministrador()
                 || "Empleado".equalsIgnoreCase(usuario.getRol().getNombre());
         if (puedeVender) {
-            JButton btnVentas = new JButton("Registrar venta");
-            btnVentas.setContentAreaFilled(false);
-            btnVentas.setOpaque(true);
-            btnVentas.setBorderPainted(false);
-            btnVentas.setBackground(VERDE);
-            btnVentas.setForeground(Color.WHITE);
-            btnVentas.setFont(new Font("SansSerif", Font.BOLD, 14));
-            btnVentas.setFocusPainted(false);
-            btnVentas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnVentas.addActionListener(e -> new VentaFrame().setVisible(true));
             gc.gridy = 5;
-            gc.insets = new Insets(0, 0, 8, 0);
-            panel.add(btnVentas, gc);
+            panel.add(opcion("Registrar venta", 3, KeyEvent.VK_3, VentaFrame::new), gc);
         }
 
-        // ALE: alertas de inventario
-        JButton btnAlertas = new JButton("Alertas de inventario");
-        btnAlertas.setContentAreaFilled(false);
-        btnAlertas.setOpaque(true);
-        btnAlertas.setBorderPainted(false);
-        btnAlertas.setBackground(VERDE);
-        btnAlertas.setForeground(Color.WHITE);
-        btnAlertas.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnAlertas.setFocusPainted(false);
-        btnAlertas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnAlertas.addActionListener(e -> new AlertasFrame(usuario.getIdUsuario()).setVisible(true));
-        gc.gridy = 8;
-        gc.insets = new Insets(0, 0, 8, 0);
-        panel.add(btnAlertas, gc);
-
         // BUS-02: consultar ventas (todos los roles)
-        JButton btnConsulta = new JButton("Consultar ventas");
-        btnConsulta.setContentAreaFilled(false);
-        btnConsulta.setOpaque(true);
-        btnConsulta.setBorderPainted(false);
-        btnConsulta.setBackground(VERDE);
-        btnConsulta.setForeground(Color.WHITE);
-        btnConsulta.setFont(new Font("SansSerif", Font.BOLD, 14));
-        btnConsulta.setFocusPainted(false);
-        btnConsulta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnConsulta.addActionListener(e -> new ConsultaVentasFrame().setVisible(true));
         gc.gridy = 7;
-        gc.insets = new Insets(0, 0, 8, 0);
-        panel.add(btnConsulta, gc);
+        panel.add(opcion("Consultar ventas", 5, KeyEvent.VK_5, ConsultaVentasFrame::new), gc);
+
+        // ALE: alertas de inventario
+        gc.gridy = 8;
+        panel.add(opcion("Alertas de inventario", 4, KeyEvent.VK_4,
+                () -> new AlertasFrame(usuario.getIdUsuario())), gc);
+
         JButton btnSalir = new JButton("Cerrar sesion");
         btnSalir.setContentAreaFilled(false);
         btnSalir.setOpaque(true);
@@ -143,7 +100,6 @@ public class MenuPrincipalFrame extends JFrame {
             SesionActual.cerrar();
             new LoginFrame().setVisible(true);
             dispose();
-
         });
         gc.gridy = 9;
         gc.insets = new Insets(8, 0, 0, 0);
@@ -154,5 +110,23 @@ public class MenuPrincipalFrame extends JFrame {
         setMinimumSize(new Dimension(410, 250));
         pack();
         setLocationRelativeTo(null);
+    }
+
+    /** Crea el boton de una opcion y registra su atajo Ctrl+numero. */
+    private JButton opcion(String texto, int numero, int tecla, Supplier<JFrame> ventana) {
+        JButton boton = new JButton(texto + "  (Ctrl+" + numero + ")");
+        boton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        boton.setContentAreaFilled(false);
+        boton.setOpaque(true);
+        boton.setBorderPainted(false);
+        boton.setBackground(VERDE);
+        boton.setForeground(Color.WHITE);
+        boton.setFocusPainted(false);
+        boton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        Runnable abrir = () -> Navegacion.abrir(this, ventana.get());
+        boton.addActionListener(e -> abrir.run());
+        Navegacion.agregarAtajo(getRootPane(), tecla, "opcion" + numero, abrir);
+        return boton;
     }
 }

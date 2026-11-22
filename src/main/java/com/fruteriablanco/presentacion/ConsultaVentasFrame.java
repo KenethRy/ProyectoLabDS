@@ -6,6 +6,8 @@ import com.fruteriablanco.modelo.VentaResumen;
 import com.fruteriablanco.servicio.VentaException;
 import com.fruteriablanco.servicio.VentaService;
 
+import com.fruteriablanco.util.Navegacion;
+
 import javax.swing.*;
         import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -91,6 +93,7 @@ public class ConsultaVentasFrame extends JFrame {
         btnLimpiar.addActionListener(e -> limpiar());
         fila2.add(btnBuscar);
         fila2.add(btnLimpiar);
+        fila2.add(Navegacion.botonVolver(this));
 
         // Enter en cualquier campo tambien busca
         for (JTextField campo : new JTextField[]{txtDesde, txtHasta, txtIdentificador, txtProducto}) {

@@ -4,6 +4,8 @@ import com.fruteriablanco.modelo.Usuario;
 import com.fruteriablanco.servicio.UsuarioService;
 import com.fruteriablanco.util.SesionActual;
 
+import com.fruteriablanco.util.Navegacion;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -128,6 +130,7 @@ public class UsuarioFrame extends JFrame {
         for (JButton b : new JButton[]{btnEditar, btnEliminar, btnReactivar, btnActualizar}) {
             estilizarBoton(b, false);
         }
+        acciones.add(Navegacion.botonVolver(this));
         acciones.add(btnNuevo);
         acciones.add(btnEditar);
         acciones.add(btnEliminar);

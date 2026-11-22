@@ -1,0 +1,61 @@
+flowchart LR
+    admin(["Administrador"])
+    emp(["Empleado"])
+
+    subgraph SISTEMA["Sistema de inventario y ventas - Fruteria Blanco"]
+        subgraph SEG["Seguridad - SEG-01 / SEG-02"]
+            CU1(["Iniciar sesion"])
+            CU2(["Cerrar sesion"])
+        end
+
+        subgraph INV["Inventario - INV-01 / INV-02 / BUS-01"]
+            CU3(["Registrar producto"])
+            CU4(["Editar producto"])
+            CU5(["Desactivar o reactivar producto"])
+            CU6(["Buscar producto"])
+            CU7(["Registrar entrada de producto"])
+            CU8(["Registrar salida de producto"])
+        end
+
+        subgraph USR["Usuarios - USR-01"]
+            CU9(["Registrar usuario"])
+            CU10(["Editar usuario y rol"])
+            CU11(["Dar de baja o reactivar usuario"])
+            CU12(["Buscar usuario"])
+        end
+
+        subgraph VEN["Ventas y pagos - VEN-01 / INV-03 / PAG-01"]
+            CU13(["Buscar producto a vender"])
+            CU14(["Agregar producto al carrito"])
+            CU15(["Quitar producto del carrito"])
+            CU16(["Seleccionar metodo de pago"])
+            CU17(["Confirmar venta"])
+            CU18(["Descontar inventario automaticamente"])
+        end
+    end
+
+    admin --- CU1
+    admin --- CU2
+    admin --- CU3
+    admin --- CU4
+    admin --- CU5
+    admin --- CU6
+    admin --- CU7
+    admin --- CU8
+    admin --- CU9
+    admin --- CU10
+    admin --- CU11
+    admin --- CU12
+    admin --- CU14
+    admin --- CU15
+    admin --- CU17
+
+    emp --- CU1
+    emp --- CU2
+    emp --- CU14
+    emp --- CU15
+    emp --- CU17
+
+    CU14 -. "include" .-> CU13
+    CU17 -. "include" .-> CU16
+    CU17 -. "include" .-> CU18

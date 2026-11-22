@@ -1,0 +1,39 @@
+sequenceDiagram
+    autonumber
+    actor A as Administrador
+    participant UF as UsuarioFrame
+    participant UD as UsuarioDialog
+    participant US as UsuarioService
+    participant UR as UsuarioRepository
+    participant DB as MySQL
+
+    A->>UF: Pulsa Registrar usuario
+    UF->>UD: new UsuarioDialog(null, servicio, idAdmin)
+    UD->>US: listarRoles()
+    US->>UR: listarRoles()
+    UR->>DB: SELECT roles
+    DB-->>UD: Roles disponibles
+
+    A->>UD: Captura nombre, correo, rol y contrasena, pulsa Guardar
+    UD->>US: crear(usuario, contrasena, confirmacion, idAdmin)
+
+    US->>US: normalizar() y validarDatos()<br/>nombre, correo con formato valido y rol
+    US->>US: validarContrasena()<br/>minimo 6 caracteres y confirmacion igual
+    US->>UR: existeCorreo(correo)
+    UR->>DB: SELECT correo
+    DB-->>US: existe o no
+
+    alt Datos invalidos o correo duplicado
+        US-->>UD: IllegalArgumentException con el mensaje
+        UD-->>A: Muestra el mensaje y no guarda
+    else Todo correcto
+        US->>US: BCrypt.hashpw(contrasena)
+        US->>UR: insertar(usuario, idAdmin)
+        UR->>DB: BEGIN
+        UR->>DB: INSERT usuarios (con contrasena_hash y creado_por)
+        UR->>DB: INSERT bitacora_auditoria (CREAR)
+        UR->>DB: COMMIT
+        UR-->>UD: listo
+        UD-->>UF: Cierra y recarga la lista
+        UF-->>A: Usuario visible en la tabla
+    end

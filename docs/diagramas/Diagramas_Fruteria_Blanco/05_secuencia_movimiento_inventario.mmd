@@ -1,0 +1,48 @@
+sequenceDiagram
+    autonumber
+    actor A as Administrador
+    participant PF as ProductoFrame
+    participant MD as MovimientoDialog
+    participant PS as ProductoService
+    participant PR as ProductoRepository
+    participant DB as MySQL
+
+    A->>PF: Selecciona un producto y pulsa Registrar entrada o salida
+    PF->>MD: new MovimientoDialog(producto, tipo)
+    MD->>PS: listarMotivos(tipo)
+    PS->>PR: listarMotivos(tipo)
+    PR->>DB: SELECT motivos_movimiento
+    DB-->>MD: Motivos disponibles
+
+    A->>MD: Captura cantidad y motivo, pulsa Registrar
+    MD->>PS: registrarMovimiento(idProducto, tipo, cantidad, motivo, ...)
+    PS->>PS: Valida cantidad mayor a cero, motivo, proveedor y vencimiento
+
+    alt Datos invalidos
+        PS-->>MD: IllegalArgumentException
+        MD-->>A: Muestra el mensaje
+    else Datos validos
+        PS->>PR: registrarMovimiento(...)
+        PR->>DB: BEGIN
+        PR->>DB: SELECT stock FROM productos FOR UPDATE
+        alt Tipo ENTRADA
+            PR->>DB: Busca o crea proveedor e INSERT lotes
+            Note over PR: stockNuevo = stockAnterior + cantidad
+        else Tipo SALIDA
+            alt La cantidad supera el stock
+                PR->>DB: ROLLBACK
+                PR-->>MD: SQLException "La salida supera la existencia"
+                MD-->>A: Muestra el mensaje
+            else Hay existencia
+                PR->>DB: UPDATE lotes (descuenta cantidad_actual)
+                Note over PR: stockNuevo = stockAnterior - cantidad
+            end
+        end
+        PR->>DB: UPDATE productos SET stock
+        PR->>DB: INSERT movimientos_inventario (stock anterior y nuevo)
+        PR->>DB: INSERT bitacora_auditoria (MODIFICAR)
+        PR->>DB: COMMIT
+        PR-->>MD: listo
+        MD-->>PF: Cierra y recarga la tabla
+        PF-->>A: Stock actualizado
+    end

@@ -1,0 +1,40 @@
+flowchart TD
+    inicio(["Inicio: abrir Registrar venta"])
+    buscar["Buscar producto por codigo, nombre o categoria<br/>solo aparecen productos activos"]
+    elegir["Seleccionar producto y escribir la cantidad"]
+
+    val1{"Cantidad valida?<br/>numero mayor a cero, maximo 3 decimales<br/>entera si no se vende por KG"}
+    val2{"Cantidad en carrito<br/>menor o igual al stock?"}
+    err1["Mostrar el error de la cantidad"]
+    err2["Mostrar: stock insuficiente"]
+
+    agregar["Agregar al carrito<br/>suma si el producto ya estaba"]
+    mas{"Agregar otro producto?"}
+
+    pago["Elegir metodo de pago<br/>y pulsar Confirmar venta"]
+    val3{"Hay productos en el carrito,<br/>metodo de pago elegido<br/>y venta no registrada antes?"}
+    err3["Mostrar el mensaje que corresponde"]
+
+    tx["Asignar folio y usuario de la sesion<br/>iniciar transaccion"]
+    venta["Insertar venta COMPLETADA"]
+    reng["Por cada renglon: bloquear el stock"]
+    val4{"Hay stock suficiente?"}
+    rollback["ROLLBACK<br/>no se guarda nada"]
+    desc["Insertar detalle, descontar stock y lotes<br/>registrar movimiento de SALIDA"]
+    pagoins["Insertar el pago con el metodo elegido"]
+    commit["COMMIT"]
+    fin(["Fin: venta registrada con su folio"])
+
+    inicio --> buscar --> elegir --> val1
+    val1 -- No --> err1 --> elegir
+    val1 -- Si --> val2
+    val2 -- No --> err2 --> elegir
+    val2 -- Si --> agregar --> mas
+    mas -- Si --> buscar
+    mas -- No --> pago --> val3
+    val3 -- No --> err3 --> pago
+    val3 -- Si --> tx --> venta --> reng --> val4
+    val4 -- No --> rollback --> pago
+    val4 -- Si --> desc
+    desc -- "Quedan renglones" --> reng
+    desc -- "Ultimo renglon" --> pagoins --> commit --> fin

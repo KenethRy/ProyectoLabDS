@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 /**
  * Menu principal posterior al inicio de sesion.
- * Atajos: Ctrl+1 Productos, Ctrl+2 Usuarios, Ctrl+3 Ventas, Ctrl+4 Alertas, Ctrl+5 Consultar ventas.
+ * Atajos: Ctrl+1 Productos, Ctrl+2 Usuarios, Ctrl+3 Ventas, Ctrl+4 Alertas, Ctrl+5 Consultar ventas, Ctrl+6 Respaldo (Administrador).
  * Al abrir una ventana el menu se oculta y reaparece al volver (boton Volver o Ctrl+B).
  */
 public class MenuPrincipalFrame extends JFrame {
@@ -62,6 +62,10 @@ public class MenuPrincipalFrame extends JFrame {
             // USR-01: registrar y administrar usuarios (solo Administrador)
             gc.gridy = 4;
             panel.add(opcion("Registrar y administrar usuarios", 2, KeyEvent.VK_2, UsuarioFrame::new), gc);
+
+            // BD-01: respaldo y restauracion (solo Administrador)
+            gc.gridy = 6;
+            panel.add(opcion("Respaldo y restauración", 6, KeyEvent.VK_6, RespaldoFrame::new), gc);
         } else {
             JLabel aviso = new JLabel("La administración de productos esta disponible para el rol Administrador.", SwingConstants.CENTER);
             aviso.setFont(new Font("SansSerif", Font.PLAIN, 13));

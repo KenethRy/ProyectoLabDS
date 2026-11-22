@@ -46,6 +46,27 @@ public final class Conexion {
                         + "en la raiz del proyecto o en src/main/resources y configura el servidor MySQL.");
     }
 
+    public static String getUrl() {
+        String url = CONFIG.getProperty("db.url");
+        return url == null ? "" : url.trim();
+    }
+
+    public static String getUsuario() {
+        String u = CONFIG.getProperty("db.user");
+        return u == null ? "" : u.trim();
+    }
+
+    public static String getClave() {
+        String c = CONFIG.getProperty("db.password");
+        return c == null ? "" : c;
+    }
+
+    /** Propiedad opcional del archivo db.properties (por ejemplo db.mysql.bin). */
+    public static String getPropiedad(String nombre) {
+        String valor = CONFIG.getProperty(nombre);
+        return valor == null || valor.isBlank() ? null : valor.trim();
+    }
+
     /** Abre una conexion nueva. Quien la pida debe cerrarla con try-with-resources. */
     public static Connection getConnection() throws SQLException {
         String url = CONFIG.getProperty("db.url");

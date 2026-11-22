@@ -6,6 +6,8 @@ import com.fruteriablanco.modelo.Usuario;
 import com.fruteriablanco.servicio.ProductoService;
 import com.fruteriablanco.util.SesionActual;
 
+import com.fruteriablanco.util.Navegacion;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -30,7 +32,7 @@ public class ProductoFrame extends JFrame {
     private final JLabel lblEstado = new JLabel(" ");
 
     private final JButton btnNuevo = new JButton("Registrar producto");
-    private final JButton btnEditar = new JButton("Editar datos");
+    private final JButton btnEditar = new JButton("Editar producto");
     private final JButton btnEntrada = new JButton("Registrar entrada");
     private final JButton btnSalida = new JButton("Registrar salida");
     private final JButton btnDesactivar = new JButton("Desactivar");
@@ -213,6 +215,7 @@ public class ProductoFrame extends JFrame {
         estilizarBoton(btnActivar, false);
         estilizarBoton(btnActualizar, false);
 
+        acciones.add(Navegacion.botonVolver(this));
         acciones.add(btnNuevo);
         acciones.add(btnEditar);
         acciones.add(btnEntrada);

@@ -3,6 +3,8 @@ package com.fruteriablanco.presentacion;
 import com.fruteriablanco.modelo.Alerta;
 import com.fruteriablanco.servicio.AlertaService;
 
+import com.fruteriablanco.util.Navegacion;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -80,6 +82,7 @@ public class AlertasFrame extends JFrame {
 
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         botones.setOpaque(false);
+        botones.add(Navegacion.botonVolver(this));
         botones.add(btnActualizar);
         botones.add(btnAtender);
 

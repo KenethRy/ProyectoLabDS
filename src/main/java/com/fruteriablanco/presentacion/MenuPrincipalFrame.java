@@ -5,10 +5,8 @@ import com.fruteriablanco.util.SesionActual;
 
 import javax.swing.*;
 import java.awt.*;
-import com.fruteriablanco.servicio.AlertaService;
-import java.sql.SQLException;
 
-
+/** Menu principal posterior al inicio de sesion. */
 public class MenuPrincipalFrame extends JFrame {
 
     private static final Color VERDE = new Color(46, 125, 82);
@@ -102,27 +100,20 @@ public class MenuPrincipalFrame extends JFrame {
             gc.insets = new Insets(0, 0, 8, 0);
             panel.add(btnVentas, gc);
         }
-
-        // Alertas de inventario (Administrador y Propietario)
-        boolean veAlertas = usuario.esAdministrador()
-                || "Propietario".equalsIgnoreCase(usuario.getRol().getNombre());
-        if (veAlertas) {
-            JButton btnAlertas = new JButton("Alertas de inventario");
-            btnAlertas.setContentAreaFilled(false);
-            btnAlertas.setOpaque(true);
-            btnAlertas.setBorderPainted(false);
-            btnAlertas.setBackground(VERDE);
-            btnAlertas.setForeground(Color.WHITE);
-            btnAlertas.setFont(new Font("SansSerif", Font.BOLD, 14));
-            btnAlertas.setFocusPainted(false);
-            btnAlertas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnAlertas.addActionListener(e ->
-                    new AlertasFrame(usuario.getIdUsuario()).setVisible(true));
-            gc.gridy = 6;
-            gc.insets = new Insets(0, 0, 8, 0);
-            panel.add(btnAlertas, gc);
-        }
-
+        // BUS-02: consultar ventas (todos los roles)
+        JButton btnConsulta = new JButton("Consultar ventas");
+        btnConsulta.setContentAreaFilled(false);
+        btnConsulta.setOpaque(true);
+        btnConsulta.setBorderPainted(false);
+        btnConsulta.setBackground(VERDE);
+        btnConsulta.setForeground(Color.WHITE);
+        btnConsulta.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnConsulta.setFocusPainted(false);
+        btnConsulta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnConsulta.addActionListener(e -> new ConsultaVentasFrame().setVisible(true));
+        gc.gridy = 7;
+        gc.insets = new Insets(0, 0, 8, 0);
+        panel.add(btnConsulta, gc);
         JButton btnSalir = new JButton("Cerrar sesion");
         btnSalir.setContentAreaFilled(false);
         btnSalir.setOpaque(true);
@@ -136,8 +127,9 @@ public class MenuPrincipalFrame extends JFrame {
             SesionActual.cerrar();
             new LoginFrame().setVisible(true);
             dispose();
+
         });
-        gc.gridy = 7;
+        gc.gridy = 8;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnSalir, gc);
 

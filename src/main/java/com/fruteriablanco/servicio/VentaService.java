@@ -16,6 +16,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import com.fruteriablanco.modelo.VentaResumen;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 /**
  * Capa de servicio de VEN-01: reglas para registrar ventas.
@@ -144,5 +149,54 @@ public class VentaService {
             throw new VentaException("La cantidad admite maximo 3 decimales.");
         }
         return cantidad;
+    }
+    // ------------------------------------------------------------------
+    // BUS-02: consultar ventas
+    // ------------------------------------------------------------------
+
+    private static final DateTimeFormatter FORMATO_FECHA =
+            DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
+
+    /**
+     * Busca ventas por fecha (desde/hasta, formato dd/MM/aaaa), identificador
+     * (folio o numero de venta) y producto (nombre o codigo). Todos son opcionales.
+     * Si nada coincide devuelve una lista vacia: la pantalla informa que no hay resultados.
+     */
+    public List<VentaResumen> consultar(String desdeTexto, String hastaTexto,
+                                        String identificador, String producto) throws VentaException {
+        LocalDate desde = leerFecha(desdeTexto, "desde");
+        LocalDate hasta = leerFecha(hastaTexto, "hasta");
+
+        if (desde != null && hasta != null && desde.isAfter(hasta)) {
+            throw new VentaException("La fecha \"desde\" no puede ser posterior a la fecha \"hasta\".");
+        }
+
+        try {
+            return ventaRepository.buscar(desde, hasta, identificador, producto);
+        } catch (SQLException e) {
+            throw new VentaException("No se pudo consultar las ventas. Verifica que MySQL este encendido.", e);
+        }
+    }
+
+    /** Productos de una venta ya registrada. */
+    public List<DetalleVenta> detalleDe(int idVenta) throws VentaException {
+        try {
+            return ventaRepository.detalleDe(idVenta);
+        } catch (SQLException e) {
+            throw new VentaException("No se pudo cargar el detalle de la venta.", e);
+        }
+    }
+
+    /** Fecha opcional: vacia = sin filtro; si se escribe, debe ser una fecha real dd/MM/aaaa. */
+    private LocalDate leerFecha(String texto, String nombreCampo) throws VentaException {
+        if (texto == null || texto.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(texto.trim(), FORMATO_FECHA);
+        } catch (DateTimeParseException e) {
+            throw new VentaException("La fecha \"" + nombreCampo
+                    + "\" no es valida. Usa el formato dd/mm/aaaa (por ejemplo 18/11/2026).");
+        }
     }
 }

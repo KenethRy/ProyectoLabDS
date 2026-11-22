@@ -12,7 +12,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import com.fruteriablanco.modelo.VentaResumen;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Capa de repositorio de ventas: guarda la venta, sus renglones y descuenta
  * el inventario, todo en una sola transaccion (o se guarda todo o nada).
@@ -195,5 +200,103 @@ public class VentaRepository {
             ps.setString(8, venta.getFolio());
             ps.executeUpdate();
         }
+    }
+    // ------------------------------------------------------------------
+    // BUS-02: consultar ventas
+    // ------------------------------------------------------------------
+
+    /**
+     * Busca ventas registradas. Todos los filtros son opcionales y se combinan:
+     * desde/hasta (fechas incluidas), identificador (folio o numero de venta) y
+     * producto (nombre o codigo). Devuelve las 200 ventas mas recientes que coincidan.
+     */
+    public List<VentaResumen> buscar(LocalDate desde, LocalDate hasta,
+                                     String identificador, String producto) throws SQLException {
+        StringBuilder sql = new StringBuilder("""
+                SELECT v.id_venta, v.folio, v.fecha_venta, u.nombre AS vendedor, v.total, v.estado
+                FROM ventas v
+                JOIN usuarios u ON u.id_usuario = v.id_usuario
+                WHERE 1 = 1
+                """);
+        List<Object> parametros = new ArrayList<>();
+
+        if (desde != null) {
+            sql.append(" AND v.fecha_venta >= ?");
+            parametros.add(Timestamp.valueOf(desde.atStartOfDay()));
+        }
+        if (hasta != null) {
+            // hasta se incluye completo: se compara contra el inicio del dia siguiente
+            sql.append(" AND v.fecha_venta < ?");
+            parametros.add(Timestamp.valueOf(hasta.plusDays(1).atStartOfDay()));
+        }
+        if (identificador != null && !identificador.isBlank()) {
+            String id = identificador.trim();
+            if (id.matches("\\d+")) {
+                sql.append(" AND (v.id_venta = ? OR v.folio LIKE ?)");
+                parametros.add(Integer.parseInt(id));
+            } else {
+                sql.append(" AND v.folio LIKE ?");
+            }
+            parametros.add("%" + id + "%");
+        }
+        if (producto != null && !producto.isBlank()) {
+            sql.append("""
+                     AND EXISTS (
+                         SELECT 1 FROM detalle_venta d
+                         JOIN productos p ON p.id_producto = d.id_producto
+                         WHERE d.id_venta = v.id_venta
+                           AND (p.nombre LIKE ? OR p.codigo LIKE ?))
+                    """);
+            String like = "%" + producto.trim() + "%";
+            parametros.add(like);
+            parametros.add(like);
+        }
+        sql.append(" ORDER BY v.fecha_venta DESC, v.id_venta DESC LIMIT 200");
+
+        List<VentaResumen> resultado = new ArrayList<>();
+        try (Connection con = Conexion.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            for (int i = 0; i < parametros.size(); i++) {
+                ps.setObject(i + 1, parametros.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(new VentaResumen(
+                            rs.getInt("id_venta"),
+                            rs.getString("folio"),
+                            rs.getTimestamp("fecha_venta").toLocalDateTime(),
+                            rs.getString("vendedor"),
+                            rs.getBigDecimal("total"),
+                            rs.getString("estado")));
+                }
+            }
+        }
+        return resultado;
+    }
+
+    /** Renglones (productos) de una venta ya registrada. */
+    public List<DetalleVenta> detalleDe(int idVenta) throws SQLException {
+        String sql = """
+                SELECT d.id_producto, p.nombre, d.cantidad, d.precio_unitario
+                FROM detalle_venta d
+                JOIN productos p ON p.id_producto = d.id_producto
+                WHERE d.id_venta = ?
+                ORDER BY d.id_detalle
+                """;
+        List<DetalleVenta> detalles = new ArrayList<>();
+        try (Connection con = Conexion.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idVenta);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    detalles.add(new DetalleVenta(
+                            rs.getInt("id_producto"),
+                            rs.getString("nombre"),
+                            rs.getBigDecimal("cantidad"),
+                            rs.getBigDecimal("precio_unitario")));
+                }
+            }
+        }
+        return detalles;
     }
 }

@@ -7,7 +7,9 @@ import com.fruteriablanco.util.Conexion;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -60,15 +62,15 @@ public class ComprobanteDialog extends JDialog {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
 
         JButton btnImprimir = new JButton("Imprimir");
-        JButton btnAbrir = new JButton("Abrir PDF");
+        JButton btnGuardar = new JButton("Guardar en la computadora");
         JButton btnCerrar = new JButton("Cerrar");
         btnImprimir.addActionListener(e -> imprimir());
-        btnAbrir.addActionListener(e -> abrir());
+        btnGuardar.addActionListener(e -> guardar());
         btnCerrar.addActionListener(e -> dispose());
 
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 8));
         botones.add(btnImprimir);
-        botones.add(btnAbrir);
+        botones.add(btnGuardar);
         botones.add(btnCerrar);
 
         setLayout(new BorderLayout());
@@ -95,12 +97,39 @@ public class ComprobanteDialog extends JDialog {
         }
     }
 
-    private void abrir() {
+    private void guardar() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Guardar comprobante");
+        chooser.setSelectedFile(new File(pdf.getFileName().toString()));
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivo PDF (*.pdf)", "pdf"));
+
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File destino = chooser.getSelectedFile();
+        if (!destino.getName().toLowerCase().endsWith(".pdf")) {
+            destino = new File(destino.getParentFile(), destino.getName() + ".pdf");
+        }
+
+        if (destino.exists()) {
+            int resp = JOptionPane.showConfirmDialog(this,
+                    "El archivo ya existe. ¿Deseas reemplazarlo?",
+                    "Guardar comprobante", JOptionPane.YES_NO_OPTION);
+            if (resp != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
         try {
-            Desktop.getDesktop().open(pdf.toFile());
+            Files.copy(pdf, destino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            JOptionPane.showMessageDialog(this,
+                    "Comprobante guardado en:\n" + destino.getAbsolutePath(),
+                    "Guardar comprobante", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "El PDF está en:\n" + pdf,
-                    "Comprobante", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo guardar el comprobante:\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

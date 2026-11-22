@@ -49,6 +49,11 @@ public class VentaRepository {
 
                     insertarDetalle(con, idVenta, d);
                     actualizarStock(con, d.getIdProducto(), stockNuevo, venta.getIdUsuario());
+                    insertarDetalle(con, idVenta, d);
+                    actualizarStock(con, d.getIdProducto(), stockNuevo, venta.getIdUsuario());
+                    generarAlertaStockBajo(con, d.getIdProducto());   // <-- solo esta es nueva
+                    descontarLotes(con, d.getIdProducto(), d.getCantidad());
+                    insertarMovimiento(con, venta, idVenta, idMotivo, d, stockAnterior, stockNuevo);
                     descontarLotes(con, d.getIdProducto(), d.getCantidad());
                     insertarMovimiento(con, venta, idVenta, idMotivo, d, stockAnterior, stockNuevo);
                 }
@@ -143,6 +148,29 @@ public class VentaRepository {
             ps.executeUpdate();
         }
     }
+
+
+
+
+    private void generarAlertaStockBajo(Connection con, int idProducto) throws SQLException {
+        String sql = """
+            INSERT INTO alertas (id_producto, tipo_alerta, estado)
+            SELECT p.id_producto, 'BAJO_STOCK', 'ACTIVA'
+            FROM productos p
+            WHERE p.id_producto = ?
+              AND p.stock <= p.stock_minimo
+              AND NOT EXISTS (
+                  SELECT 1 FROM alertas a
+                  WHERE a.id_producto = p.id_producto
+                    AND a.tipo_alerta = 'BAJO_STOCK'
+                    AND a.estado = 'ACTIVA')
+            """;
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
+            ps.executeUpdate();
+        }
+    }
+
 
     /** Descuenta de los lotes mas antiguos primero (igual que ProductoRepository). */
     private void descontarLotes(Connection con, int idProducto, BigDecimal cantidad) throws SQLException {

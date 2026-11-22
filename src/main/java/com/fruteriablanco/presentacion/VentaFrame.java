@@ -205,14 +205,16 @@ public class VentaFrame extends JFrame {
         try {
             MetodoPago metodo = (MetodoPago) cboMetodoPago.getSelectedItem();
             servicio.confirmar(venta, metodo);
-            JOptionPane.showMessageDialog(this,
-                    "Venta registrada.\nFolio: " + venta.getFolio() + "\nTotal: " + dinero(venta.getTotal())
-                            + "\nPago: " + metodo,
-                    "Venta exitosa", JOptionPane.INFORMATION_MESSAGE);
+
+            int idVenta = venta.getIdVenta();
+
             venta = new Venta();
             cboMetodoPago.setSelectedIndex(-1);
             refrescarCarrito();
-            cargarProductos(); // para ver el stock actualizado
+            cargarProductos();
+
+
+            ComprobanteDialog.emitir(this, idVenta);
         } catch (VentaException e) {
             mostrarError(e.getMessage());
         }

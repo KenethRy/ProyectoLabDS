@@ -56,7 +56,7 @@ public class ProductoService {
         repository.desactivar(idProducto, idUsuario);
     }
 
-    // NUEVO: REACTIVAR PRODUCTO
+    // REACTIVAR PRODUCTO
     public void activar(int idProducto, int idUsuario) throws SQLException {
 
         if (idProducto <= 0) {

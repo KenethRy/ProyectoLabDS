@@ -63,6 +63,10 @@ public class MenuPrincipalFrame extends JFrame {
             gc.gridy = 4;
             panel.add(opcion("Registrar y administrar usuarios", 2, KeyEvent.VK_2, UsuarioFrame::new), gc);
 
+            // AUD-01: consulta de bitacora e historial de precios (solo Administrador)
+            gc.gridy = 6;
+            panel.add(opcion("Bitácora de auditoría", 7, KeyEvent.VK_7, AuditoriaFrame::new), gc);
+
             // BD-01: respaldo y restauracion (solo Administrador)
             gc.gridy = 6;
             panel.add(opcion("Respaldo y restauración", 6, KeyEvent.VK_6, RespaldoFrame::new), gc);
@@ -83,11 +87,11 @@ public class MenuPrincipalFrame extends JFrame {
         }
 
         // BUS-02: consultar ventas (todos los roles)
-        gc.gridy = 7;
+        gc.gridy = 8;
         panel.add(opcion("Consultar ventas", 5, KeyEvent.VK_5, ConsultaVentasFrame::new), gc);
 
         // ALE: alertas de inventario
-        gc.gridy = 8;
+        gc.gridy = 9;
         panel.add(opcion("Alertas de inventario", 4, KeyEvent.VK_4,
                 () -> new AlertasFrame(usuario.getIdUsuario())), gc);
 
@@ -105,7 +109,7 @@ public class MenuPrincipalFrame extends JFrame {
             new LoginFrame().setVisible(true);
             dispose();
         });
-        gc.gridy = 9;
+        gc.gridy = 10;
         gc.insets = new Insets(8, 0, 0, 0);
         panel.add(btnSalir, gc);
 

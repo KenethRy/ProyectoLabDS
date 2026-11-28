@@ -51,11 +51,7 @@ public class VentaRepository {
 
                     insertarDetalle(con, idVenta, d);
                     actualizarStock(con, d.getIdProducto(), stockNuevo, venta.getIdUsuario());
-                    insertarDetalle(con, idVenta, d);
-                    actualizarStock(con, d.getIdProducto(), stockNuevo, venta.getIdUsuario());
-                    generarAlertaStockBajo(con, d.getIdProducto());   // <-- solo esta es nueva
-                    descontarLotes(con, d.getIdProducto(), d.getCantidad());
-                    insertarMovimiento(con, venta, idVenta, idMotivo, d, stockAnterior, stockNuevo);
+                    generarAlertaStockBajo(con, d.getIdProducto());
                     descontarLotes(con, d.getIdProducto(), d.getCantidad());
                     insertarMovimiento(con, venta, idVenta, idMotivo, d, stockAnterior, stockNuevo);
                 }

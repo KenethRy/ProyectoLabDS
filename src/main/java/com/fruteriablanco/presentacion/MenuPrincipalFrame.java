@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * Los accesos estan agrupados en Ventas, Inventario, Reportes y consultas y Administracion.
  * Cada rol ve solo las opciones que puede usar.
  * Atajos: Ctrl+1 Productos, Ctrl+2 Usuarios, Ctrl+3 Ventas, Ctrl+4 Alertas, Ctrl+5 Consultar ventas,
- * Ctrl+6 Respaldo, Ctrl+7 Bitacora, Ctrl+8 Reportes (Administrador).
+ * Ctrl+6 Respaldo, Ctrl+7 Bitacora, Ctrl+8 Reportes, Ctrl+9 Anular venta (Administrador).
  * Al abrir una ventana el menu se oculta y reaparece al volver (boton Volver o Ctrl+B).
  */
 public class MenuPrincipalFrame extends JFrame {
@@ -75,6 +75,10 @@ public class MenuPrincipalFrame extends JFrame {
         if (puedeVender) {
             seccion("Ventas", C_VENTAS);
             agregar(opcion("Registrar venta", 3, KeyEvent.VK_3, VentaFrame::new));
+        }
+        // ANU-01: anular ventas registradas por error (solo Administrador)
+        if (admin) {
+            agregar(opcion("Anular venta", 9, KeyEvent.VK_9, AnularVentaFrame::new));
         }
 
         // ---------- Inventario ----------

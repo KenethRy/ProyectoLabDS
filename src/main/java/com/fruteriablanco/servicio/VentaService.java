@@ -151,6 +151,44 @@ public class VentaService {
         return cantidad;
     }
     // ------------------------------------------------------------------
+    // ANU-01: anular venta
+    // ------------------------------------------------------------------
+
+    private static final int MAX_MOTIVO = 200;
+
+    /**
+     * Anula una venta completada (solo Administrador). La venta no se borra: pasa a CANCELADA,
+     * el stock regresa al inventario y la anulacion queda en la bitacora con su motivo.
+     */
+    public void anular(int idVenta, String motivo) throws VentaException {
+        Usuario usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            throw new VentaException("No hay una sesion iniciada.");
+        }
+        // Criterio: solo el Administrador puede anular ventas
+        if (!usuario.esAdministrador()) {
+            throw new VentaException("Solo el Administrador puede anular ventas.");
+        }
+        // Criterio: el motivo es obligatorio
+        String motivoLimpio = motivo == null ? "" : motivo.trim();
+        if (motivoLimpio.isEmpty()) {
+            throw new VentaException("Ingresa el motivo de la anulacion.");
+        }
+        if (motivoLimpio.length() > MAX_MOTIVO) {
+            throw new VentaException("El motivo permite hasta " + MAX_MOTIVO + " caracteres.");
+        }
+
+        try {
+            ventaRepository.anular(idVenta, motivoLimpio, usuario.getIdUsuario());
+        } catch (IllegalArgumentException e) {
+            // Venta inexistente, ya anulada o no completada
+            throw new VentaException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new VentaException("No se pudo anular la venta: " + e.getMessage(), e);
+        }
+    }
+
+    // ------------------------------------------------------------------
     // BUS-02: consultar ventas
     // ------------------------------------------------------------------
 

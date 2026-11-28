@@ -31,50 +31,71 @@ public class LoginFrame extends JFrame {
     }
 
     private void construirInterfaz() {
+        // ---------- Encabezado verde ----------
+        JPanel encabezado = new JPanel(new GridLayout(2, 1, 0, 2));
+        encabezado.setBackground(new Color(46, 125, 82));
+        encabezado.setBorder(BorderFactory.createEmptyBorder(22, 20, 20, 20));
+        JLabel titulo = new JLabel("Frutería Blanco", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 26));
+        titulo.setForeground(Color.WHITE);
+        JLabel subtitulo = new JLabel("Inicia sesión para continuar", SwingConstants.CENTER);
+        subtitulo.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        subtitulo.setForeground(new Color(220, 238, 226));
+        encabezado.add(titulo);
+        encabezado.add(subtitulo);
+
+        // ---------- Formulario ----------
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(24, 100, 24, 100));
+        panel.setBackground(new Color(247, 250, 246));
+        panel.setBorder(BorderFactory.createEmptyBorder(22, 70, 26, 70));
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
         gc.fill = GridBagConstraints.HORIZONTAL;
-        gc.insets = new Insets(4, 0, 4, 0);
+        gc.weightx = 1;
 
-        JLabel titulo = new JLabel("Frutería Blanco", SwingConstants.CENTER);
-        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 22f));
-        titulo.setForeground(new Color(30, 100, 200));   // azul
-        gc.gridy = 0;
-        gc.insets = new Insets(0, 0, 16, 0);
-        panel.add(titulo, gc);
-
-        gc.insets = new Insets(4, 0, 4, 0);
-        gc.gridy = 1;
-        panel.add(new JLabel("Correo"), gc);
-        gc.gridy = 2;
+        int fila = 0;
+        gc.insets = new Insets(0, 0, 4, 0);
+        gc.gridy = fila++;
+        panel.add(etiqueta("Correo"), gc);
+        gc.insets = new Insets(0, 0, 12, 0);
+        gc.gridy = fila++;
         panel.add(txtCorreo, gc);
-        gc.gridy = 3;
-        panel.add(new JLabel("Contraseña"), gc);
-        gc.gridy = 4;
+        gc.insets = new Insets(0, 0, 4, 0);
+        gc.gridy = fila++;
+        panel.add(etiqueta("Contraseña"), gc);
+        gc.insets = new Insets(0, 0, 8, 0);
+        gc.gridy = fila++;
         panel.add(txtContrasena, gc);
 
         lblMensaje.setForeground(new Color(180, 30, 30));
-        gc.gridy = 5;
+        gc.insets = new Insets(0, 0, 6, 0);
+        gc.gridy = fila++;
         panel.add(lblMensaje, gc);
-        btnIngresar.setContentAreaFilled(false);   // quita el relleno de Windows
-        btnIngresar.setOpaque(true);               // deja pintar nuestro color
+
         btnIngresar.setBackground(new Color(46, 125, 82));
         btnIngresar.setForeground(Color.WHITE);
-        btnIngresar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnIngresar.setFont(new Font("SansSerif", Font.BOLD, 15));
         btnIngresar.setFocusPainted(false);
-        btnIngresar.setBorderPainted(false);
         btnIngresar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        gc.gridy = 6;
-        gc.insets = new Insets(8, 0, 0, 0);
+        btnIngresar.setMargin(new Insets(8, 14, 8, 14));
+        gc.insets = new Insets(6, 0, 0, 0);
+        gc.gridy = fila++;
         panel.add(btnIngresar, gc);
 
-        setContentPane(panel);
+        JPanel raiz = new JPanel(new BorderLayout());
+        raiz.add(encabezado, BorderLayout.NORTH);
+        raiz.add(panel, BorderLayout.CENTER);
+        setContentPane(raiz);
         getRootPane().setDefaultButton(btnIngresar); // Enter inicia sesión
 
         btnIngresar.addActionListener(e -> iniciarSesion());
+    }
+
+    private JLabel etiqueta(String texto) {
+        JLabel l = new JLabel(texto);
+        l.setFont(new Font("SansSerif", Font.BOLD, 13));
+        return l;
     }
 
     private void iniciarSesion() {

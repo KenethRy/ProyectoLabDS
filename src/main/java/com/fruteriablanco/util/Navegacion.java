@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /** Navegacion entre el menu principal y sus ventanas, y atajos de teclado. */
@@ -24,7 +26,63 @@ public final class Navegacion {
                 menu.toFront();
             }
         });
+        agregarBarraSuperior(destino);
         destino.setVisible(true);
+    }
+
+    /**
+     * Pone arriba de la ventana una barra verde con la flecha "Volver al menu" y el nombre de la
+     * pantalla. El boton Volver original de cada pantalla se oculta (sigue funcionando con
+     * Ctrl+B y la barra lo acciona, asi la confirmacion de VentaFrame se conserva).
+     */
+    private static void agregarBarraSuperior(JFrame ventana) {
+        List<JButton> originales = new ArrayList<>();
+        buscarBotonesVolver(ventana.getContentPane(), originales);
+        if (originales.isEmpty()) {
+            return;
+        }
+        JButton original = originales.get(0);
+        originales.forEach(b -> b.setVisible(false));
+
+        Color verde = new Color(46, 125, 82);
+        JButton flecha = new JButton("\u2190  Volver al men\u00fa");
+        flecha.setBackground(Color.WHITE);
+        flecha.setForeground(verde);
+        flecha.setFont(new Font("SansSerif", Font.BOLD, 13));
+        flecha.setFocusPainted(false);
+        flecha.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        flecha.setToolTipText("Volver al men\u00fa principal (Ctrl+B)");
+        flecha.addActionListener(e -> original.doClick());
+
+        String nombre = ventana.getTitle().replace(" - Fruter\u00eda Blanco", "");
+        JLabel titulo = new JLabel(nombre, SwingConstants.RIGHT);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 15));
+        titulo.setForeground(Color.WHITE);
+
+        JPanel barra = new JPanel(new BorderLayout(12, 0));
+        barra.setBackground(verde);
+        barra.setBorder(BorderFactory.createEmptyBorder(9, 14, 9, 18));
+        barra.add(flecha, BorderLayout.WEST);
+        barra.add(titulo, BorderLayout.CENTER);
+
+        Container contenido = ventana.getContentPane();
+        Dimension tamano = ventana.getSize();
+        JPanel raiz = new JPanel(new BorderLayout());
+        raiz.add(barra, BorderLayout.NORTH);
+        raiz.add(contenido, BorderLayout.CENTER);
+        ventana.setContentPane(raiz);
+        ventana.setSize(tamano.width, tamano.height + barra.getPreferredSize().height);
+        ventana.setLocationRelativeTo(null);
+    }
+
+    private static void buscarBotonesVolver(Container c, List<JButton> encontrados) {
+        for (Component hijo : c.getComponents()) {
+            if (hijo instanceof JButton b && Boolean.TRUE.equals(b.getClientProperty("esVolver"))) {
+                encontrados.add(b);
+            } else if (hijo instanceof Container interior) {
+                buscarBotonesVolver(interior, encontrados);
+            }
+        }
     }
 
     /** Boton "Volver" que tambien responde a Ctrl+B. */
@@ -40,7 +98,8 @@ public final class Navegacion {
             }
         };
 
-        JButton boton = new JButton("Volver (Ctrl+B)");
+        JButton boton = new JButton("\u2190 Volver (Ctrl+B)");
+        boton.putClientProperty("esVolver", true);
         boton.setContentAreaFilled(false);
         boton.setOpaque(true);
         boton.setBorderPainted(false);
